@@ -1,19 +1,3 @@
-/*
- * Copyright © 2017-2019 Cask Data, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 grammar Directives;
 
 options {
@@ -64,6 +48,8 @@ directive
     | stringList
     | numberRanges
     | properties
+    | byteSizeArg
+    | timeDurationArg
   )*?
   ;
 
@@ -140,7 +126,12 @@ numberRange
  ;
 
 value
- : String | Number | Column | Bool
+ : Number              #numberValue
+ | String              #stringValue
+ | Column              #columnValue
+ | Bool                #booleanValue
+ | BYTE_SIZE           #byteSizeValue
+ | TIME_DURATION       #timeDurationValue
  ;
 
 ecommand
@@ -194,6 +185,14 @@ stringList
 identifierList
  : Identifier (',' Identifier)*
  ;
+
+byteSizeArg
+  : BYTE_SIZE
+  ;
+
+timeDurationArg
+  : TIME_DURATION
+  ;
 
 
 /*
@@ -311,3 +310,19 @@ fragment Int
 fragment Digit
  : [0-9]
  ;
+
+BYTE_SIZE
+  : Number BYTE_UNIT
+  ;
+
+fragment BYTE_UNIT
+  : ('b'|'B'|'kb'|'KB'|'mb'|'MB'|'gb'|'GB'|'tb'|'TB'|'pb'|'PB')
+  ;
+
+TIME_DURATION
+  : Number TIME_UNIT
+  ;
+
+fragment TIME_UNIT
+  : ('ns'|'ms'|'s'|'m'|'h'|'d')
+  ;
